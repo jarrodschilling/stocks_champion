@@ -4,7 +4,7 @@ import StockService from "../services/StockService";
 
 
 const TradeForm = (props) => {
-
+    const {loaded, setLoaded} = props
     const [stockState, setStockState] = useState({
         ticker: "",
         price: 0,
@@ -21,9 +21,11 @@ const TradeForm = (props) => {
         price: "Price required",
         date: "Proper date required",
         shares: "Number of shares required",
-        buySell: "Trade type required",
-        shaper: "",
-        tactical: ""
+        buySell: "Trade type required"
+    })
+    const [notRequired, setNotRequired] = useState({
+        shaper: "Do you want a Shaper Pattern?",
+        tactical: "Do you want a Tactical Pattern?"
     })
 
     const navigate = useNavigate()
@@ -107,17 +109,15 @@ const TradeForm = (props) => {
                 ...prevState,
                 [e.target.name]: newValue
             }))
-            let errorMsg = ''
+            let reminderMsg = ''
             if (newValue) {
-                if (newValue.length < 2) {
-                    errorMsg = "Shaper pattern must be at least 2 characters long"
-                } else if (newValue.length > 100) {
-                    errorMsg = "Shaper pattern must be less than 100 characters long"
+                if (newValue === "none") {
+                    reminderMsg = "Do you want a shaper pattern?"
                 }
             } else {
-                errorMsg = "Do you want to enter a shaper pattern?"
+                reminderMsg = "Do you want a shaper pattern?"
             }
-            setFormErrors({...formErrors, shaper: errorMsg})
+            setNotRequired({...notRequired, shaper: reminderMsg})
         }
         else if (e.target.name === "tactical") {
             let newValue = e.target.value
@@ -125,17 +125,15 @@ const TradeForm = (props) => {
                 ...prevState,
                 [e.target.name]: newValue
             }))
-            let errorMsg = ''
+            let reminderMsg = ''
             if (newValue) {
-                if (newValue.length < 2) {
-                    errorMsg = "Tactical pattern must be at least 2 characters long"
-                } else if (newValue.length > 100) {
-                    errorMsg = "Tactical pattern must be less than 100 characters long"
+                if (newValue === "none") {
+                    reminderMsg = "Do you want a tactical pattern?"
                 }
             } else {
-                errorMsg = "Do you want to enter a tactical pattern?"
+                reminderMsg = "Do you want a tactical pattern?"
             }
-            setFormErrors({...formErrors, tactical: errorMsg})
+            setNotRequired({...notRequired, tactical: reminderMsg})
         }
         else if (e.target.name === "date") {
             let newValue = e.target.value
@@ -152,13 +150,12 @@ const TradeForm = (props) => {
 
 
 
-
     const handleSubmit = (e) => {
         e.preventDefault();
         StockService.addOneStock(stockState)
             .then(res => {
             console.log(res)
-            navigate("/")
+            setLoaded(false)
             })
             .catch((err) => {
                 console.log(err);
@@ -172,21 +169,21 @@ const TradeForm = (props) => {
 
 
     return(
-        <div>
+        <div className="tradeFormContainer">
             <h1>Add a Trade</h1>
-            <form onSubmit={handleSubmit}>
+            <form className="tradeForm" onSubmit={handleSubmit}>
                 <label htmlFor="ticker">Ticker</label>
                 <input type="text" name="ticker" id="ticker" value={stockState.ticker} onChange={handleChange} />
                 {formErrors.ticker && <p>{formErrors.ticker}</p>}
                 {errors.ticker && <p>{errors.ticker.message}</p>}
 
                 <label htmlFor="price">Price</label>
-                <input type="text" name="price" id="price" value={stockState.price} onChange={handleChange} />
+                <input type="number" name="price" id="price" value={stockState.price} onChange={handleChange} />
                 {formErrors.price && <p>{formErrors.price}</p>}
                 {errors.price && <p>{errors.price.message}</p>}
 
                 <label htmlFor="shares">Shares</label>
-                <input type="text" name="shares" id="shares" value={stockState.shares} onChange={handleChange} />
+                <input type="number" name="shares" id="shares" value={stockState.shares} onChange={handleChange} />
                 {formErrors.shares && <p>{formErrors.shares}</p>}
                 {errors.shares && <p>{errors.shares.message}</p>}
 
@@ -219,7 +216,7 @@ const TradeForm = (props) => {
                 </select>
 
                 {/* <input type="text" name="shaper" id="shaper" value={stockState.shaper} onChange={handleChange} /> */}
-                {formErrors.shaper && <p>{formErrors.shaper}</p>}
+                {notRequired.shaper && <p>{notRequired.shaper}</p>}
                 {errors.shaper && <p>{errors.shaper.message}</p>}
 
                 <label htmlFor="tactical">Tactical Pattern</label>
@@ -237,10 +234,10 @@ const TradeForm = (props) => {
 
                 </select>
                 {/* <input type="text" name="tactical" id="tactical" value={stockState.tactical} onChange={handleChange} /> */}
-                {formErrors.tactical && <p>{formErrors.tactical}</p>}
+                {notRequired.tactical && <p>{notRequired.tactical}</p>}
                 {errors.tactical && <p>{errors.tactical.message}</p>}
 
-                <button className="addStock" type="submit" disabled={!validateForm()}>Confirm Trade</button>
+                <button className="confirmTrade" type="submit" disabled={!validateForm()}>Confirm Trade</button>
             </form>
         </div>
     )

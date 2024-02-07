@@ -3,7 +3,8 @@ import StockService from "../services/StockService.jsx"
 
 const Display = (props) => {
 
-    const [stocks, setStocks] = useState([])
+    // const [stocks, setStocks] = useState([])
+    const {stocks, setStocks} = props
 
     function dateChanger(dateISO) {
         const dateObject = new Date(dateISO)
@@ -11,16 +12,36 @@ const Display = (props) => {
 
         return newDate
     }
-    useEffect(() => {
-        StockService.getAllStocks()
-            .then((res) => {
-                console.log(res);
-                setStocks(res);
+
+    function totalCost(price, shares) {
+        const cost = price * shares
+        const formattedNumber = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(cost);
+        return formattedNumber
+    }
+
+    function formatedPrice(price) {
+        const formattedNumber = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD'
+        }).format(price);
+        return formattedNumber
+    }
+
+    const deleteHandler = (idForDeletion) => {
+        StockService.deleteOneStock(idForDeletion)
+            .then((res)=>{
+                console.log(res)
+                const filteredList = stocks.filter((stock) => {
+                    return stock._id !== idForDeletion
+                })
+                setStocks(filteredList)
             })
-            .catch((err) => {
-                console.log(err);
-            })
-    }, [])
+    }
 
     return(
         <div>
@@ -34,8 +55,10 @@ const Display = (props) => {
                         <th>Buy/Sell</th>
                         <th>Price</th>
                         <th>Shares</th>
+                        <th>Total Cost</th>
                         <th>Shaper</th>
                         <th>Tactical</th>
+                        <th>DELETE</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -47,10 +70,12 @@ const Display = (props) => {
                                 <td>{dateChanger(stock.date)}</td>
                                 <td>{stock.ticker}</td>
                                 <td>{stock.buySell}</td>
-                                <td>{stock.price}</td>
+                                <td>{formatedPrice(stock.price)}</td>
                                 <td>{stock.shares}</td>
+                                <td>{totalCost(stock.price, stock.shares)}</td>
                                 <td>{stock.shaper}</td>
                                 <td>{stock.tactical}</td>
+                                <td><button onClick={()=>deleteHandler(stock._id)}>DELETE</button></td>
                             </tr>
                         )
                     )}

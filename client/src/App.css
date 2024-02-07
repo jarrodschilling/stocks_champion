@@ -4,3 +4,20 @@
   padding: 2rem;
   text-align: center;
 }
+
+.tradeFormContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.tradeForm {
+  display: flex;
+  flex-direction: column;
+  width: 20%;
+}
+
+.confirmTrade {
+  padding: 10px 20px;
+  margin-top: 30px;
+}
