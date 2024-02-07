@@ -13,10 +13,10 @@ const StockSchema = new Schema(
             min: [10, "Don't trade stocks under $10!"],
             max: [5000, "What stock trades above $5,000?"]
         },
-        // date: {
-        //     type: Date,
-        //     required: [true, "Date of buy/sell required"]
-        // },
+        date: {
+            type: Date,
+            required: [true, "Date of buy/sell required"]
+        },
         shares: {
             type: Number,
             required: [true, "Number of shares required"],
